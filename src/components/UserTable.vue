@@ -36,9 +36,6 @@ export default {
     selectedUser: Number,
     editMode: Boolean,
   },
-  updated() {
-    console.log(this.$props.selectedUser)
-  },
   methods: {
     getFlag(countryCode) {
       return countryCode
@@ -66,6 +63,8 @@ export default {
     height: 2.5rem;
     padding: 5px;
     margin: 5px;
-    background-color: red;
+    background-color: white;
+    border: 1px solid #aaa;
+    border-radius: 5px;
   }
 </style>
