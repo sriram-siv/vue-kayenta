@@ -6,6 +6,7 @@
         :sortUsers="sortUsers"
         :editMode="editMode"
         :selectedUser="selected"
+        :sortBy="sortBy"
         @select:user="selectUser"
         @edit:user="editUser"
       />
@@ -14,7 +15,7 @@
         <v-btn v-if="!editMode" color="primary" @click="editUser">
           Edit
         </v-btn>
-        <v-btn v-else color="primary">
+        <v-btn v-else color="primary" @click="updateUser">
           Save
         </v-btn>
         <v-btn v-if="!editMode" color="warning" :disabled="this.selected === null" @click="removeUser">
@@ -44,16 +45,17 @@ export default {
   },
 
   data: () => ({
-    users: [],
     uid: 0,
-    searchValue: '',
+    users: [],
     filteredList: [],
-    selected: null,
-    editMode: false,
     sortBy: {
       field: '',
       direction: 1
     },
+    searchValue: '',
+    selected: null,
+    editMode: false,
+    savedRecord: {},
   }),
   async mounted() {
     const res = await fetch('https://randomuser.me/api/?results=10');
@@ -113,9 +115,6 @@ export default {
         console.error('invalid input', e);
       }
     },
-    clearSearch() {
-      this.$refs.searchField.clearInput();
-    },
     selectUser(user) {
       this.selected = this.selected === user.id ? null : user.id;
       this.editMode = false;
@@ -129,7 +128,14 @@ export default {
         this.editMode = false;
         return;
       }
+
       this.editMode = !this.editMode;
+
+      this.users.forEach(user => {
+        if (user.id === this.selected) {
+          this.savedRecord = { ...user }
+        }
+      });
 
     },
   },
@@ -139,7 +145,6 @@ export default {
 <style scoped>
   main {
     margin: 10px;
-    /* padding: 5px; */
     border: 1px solid #aaaa;
     border-radius: 5px;
     box-shadow: 1px 1px 3px 1px #aaaa;
