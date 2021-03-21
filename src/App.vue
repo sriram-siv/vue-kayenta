@@ -125,21 +125,19 @@ export default {
       this.users = this.users.filter(user => user.id !== this.selected);
     },
     editUser() {
-      if (this.selected === null) {
-        this.editMode = false;
-        return;
-      }
+      if (this.selected === null) return;
 
       this.editMode = !this.editMode;
 
+      // Save copy of data so that it can be restored if edit is cancelled
       this.users.forEach(user => {
         if (user.id === this.selected) {
           this.savedRecord = { ...user, name: { ...user.name } };
         }
       });
-
     },
     cancelEdit() {
+      // Restore record from save
       this.users = this.users.map(user => {
         return user.id === this.selected ? { ...this.savedRecord } : user;
       })

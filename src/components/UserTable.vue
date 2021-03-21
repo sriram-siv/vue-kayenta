@@ -39,7 +39,11 @@
           <input type="text" v-model="user.email" />
         </td>
         <td v-else>{{ user.email }}</td>
-        <td><span role="img" :aria-label="'country flag ' + user.nat">{{ getFlag(user.nat) }}</span></td>
+        <td>
+          <span role="img" :aria-label="'country flag ' + user.nat">
+            {{ getFlag(user.nat) }}
+          </span>
+        </td>
       </tr>
     </tbody>
   </v-simple-table>
@@ -65,7 +69,6 @@ export default {
     handleKeyup(event) {
       if (event.code === 'Enter') this.$emit('edit:user');
       if (event.code === 'Escape') this.$emit('edit:cancel');
-
     },
   },
   directives: {
@@ -108,6 +111,7 @@ export default {
     text-align: center;
     width: 8rem;
   }
+  
   tr {
     transition: background-color 0.1s;
   }
