@@ -4,5 +4,9 @@
  * @param {Array} keys 
  */
 export function pick(object, keys) {
-  return keys.reduce((res, key) => ({ ...res, [key]: object[key] }), {})
+  return keys.reduce((res, key) => ({ ...res, [key]: object[key] }), {});
+}
+
+export function getNestedValue(object, keys) {
+  return keys.reduce((res, key) => res[key], object);
 }

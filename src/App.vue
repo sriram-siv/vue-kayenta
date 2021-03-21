@@ -7,14 +7,21 @@
         :editMode="editMode"
         :selectedUser="selected"
         @select:user="selectUser"
+        @edit:user="editUser"
       />
       <div class="controls">
         <search-field ref="searchField" @input:search="searchUsers"/>
-        <v-btn color="primary" @click="editUser">
+        <v-btn v-if="!editMode" color="primary" @click="editUser">
           Edit
         </v-btn>
-        <v-btn color="primary" :disabled="this.selected === null" @click="removeUser">
+        <v-btn v-else color="primary">
+          Save
+        </v-btn>
+        <v-btn v-if="!editMode" color="warning" :disabled="this.selected === null" @click="removeUser">
           Remove
+        </v-btn>
+        <v-btn v-else color="primary">
+          Cancel
         </v-btn>
       </div>
 
@@ -26,7 +33,7 @@
 import UserTable from '@/components/UserTable';
 import SearchField from '@/components/SearchField';
 
-import { pick } from './helpers.js'
+import { pick, getNestedValue } from './helpers.js'
 
 export default {
   name: 'App',
@@ -43,19 +50,22 @@ export default {
     filteredList: [],
     selected: null,
     editMode: false,
+    sortBy: {
+      field: '',
+      direction: 1
+    },
   }),
   async mounted() {
     const res = await fetch('https://randomuser.me/api/?results=10');
     const data = await res.json();
 
     this.uid = 0;
-    
+
     const users = data.results
-      .map(userData => pick(userData, ['name', 'email', 'nat']))
-      .map(user => ({
-        ...user,
+      .map(userData => ({
+        ...pick(userData, ['name', 'email', 'nat']),
         id: this.uid++,
-      }));
+      }))
 
     this.users = users;
   },
@@ -68,18 +78,25 @@ export default {
     
     sortUsers(...field) {
     
-      const sorted = [...this.users].sort((a, b) => {
-        // Pull nested value out of object using provided keys
-        const valInA = field.reduce((res, key) => res[key], a).toLowerCase();
-        const valInB = field.reduce((res, key) => res[key], b).toLowerCase();
+      const sorted = [...this.filteredList].sort((a, b) => {
+        const valInA = getNestedValue(a, field).toLowerCase()
+        const valInB = getNestedValue(b, field).toLowerCase()
         return valInA.localeCompare(valInB);
       })
-      // Check to see if already sorted and return reversed if so
-      const noChange = sorted.every((user, i) => user.id === this.users[i].id)
-      this.users = noChange ? this.users.reverse() : sorted
+
+      const isActiveField = this.sortBy.field === field[field.length - 1]
+
+      this.sortBy = {
+        field: field[field.length - 1],
+        direction: isActiveField ? -this.sortBy.direction : 1
+      }
+
+      this.filteredList = this.sortBy.direction === 1 
+        ? sorted 
+        : sorted.reverse()
     },
     searchUsers(input) {
-      // this.searchValue = input;
+
       try {
         const regex = new RegExp(input, 'i');
 
@@ -122,17 +139,24 @@ export default {
 <style scoped>
   main {
     margin: 10px;
-    padding: 5px;
+    /* padding: 5px; */
     border: 1px solid #aaaa;
     border-radius: 5px;
     box-shadow: 1px 1px 3px 1px #aaaa;
   }
   .controls {
+    height: 4rem;
     display: flex;
     align-items: center;
+
+    padding: 5px;
+    padding-left: 10px;
   }
 
   .v-btn {
-    margin: auto 5px;
+    position: relative;
+    top: 5px;
+    margin: 5px;
+    width: 8rem;
   }
 </style>
