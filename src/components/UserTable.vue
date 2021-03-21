@@ -28,7 +28,7 @@
         :key="user.id"
         :class="selectedUser === user.id && 'activeRecord'"
         @focus="$emit('select:user', user)"
-        @keyup="editUser"
+        @keyup="handleKeyup"
         tabindex="0"
       >
         <td v-if="editMode && selectedUser === user.id">
@@ -62,8 +62,10 @@ export default {
         .toUpperCase()
         .replace(/./g, char => String.fromCodePoint(char.charCodeAt(0)+127397));
     },
-    editUser(event) {
+    handleKeyup(event) {
       if (event.code === 'Enter') this.$emit('edit:user');
+      if (event.code === 'Escape') this.$emit('edit:cancel');
+
     },
   },
   directives: {

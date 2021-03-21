@@ -9,6 +9,7 @@
         :sortBy="sortBy"
         @select:user="selectUser"
         @edit:user="editUser"
+        @edit:cancel="cancelEdit"
       />
       <div class="controls">
         <search-field ref="searchField" @input:search="searchUsers"/>
@@ -21,7 +22,7 @@
         <v-btn v-if="!editMode" color="warning" :disabled="this.selected === null" @click="removeUser">
           Remove
         </v-btn>
-        <v-btn v-else color="primary">
+        <v-btn v-else color="primary" @click="cancelEdit">
           Cancel
         </v-btn>
       </div>
@@ -133,10 +134,27 @@ export default {
 
       this.users.forEach(user => {
         if (user.id === this.selected) {
-          this.savedRecord = { ...user }
+          this.savedRecord = { ...user, name: { ...user.name } };
         }
       });
 
+    },
+    cancelEdit() {
+      this.users = this.users.map(user => {
+        return user.id === this.selected ? { ...this.savedRecord } : user;
+      })
+      this.editMode = false;
+    },
+    updateUser() {
+      if (this.isUpdateValid) this.editMode = false;
+    },
+  },
+  computed: {
+    isUpdateValid() {
+      const newValues = this.users.reduce((res, user) =>
+        user.id === this.selected ? user : res
+      , {});
+      return newValues.name.first !== '' && newValues.email !== '';
     },
   },
 };
