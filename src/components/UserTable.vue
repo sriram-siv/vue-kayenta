@@ -8,7 +8,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in users" :key="user.id">
+        <tr 
+          v-for="user in users" 
+          :key="user.id" 
+          @focus="selectUser(user)"
+          tabindex="0"
+        >
           <!-- <td v-if="editing === employee.id">
             <input type="text" v-model="employee.name" />
           </td> -->
@@ -44,11 +49,20 @@ export default {
       return countryCode
         .toUpperCase()
         .replace(/./g, char => String.fromCodePoint(char.charCodeAt(0)+127397));
-    }
+    },
+    selectUser(user) {
+      this.$emit('select:user', user);
+    },
   },
 }
 </script>
 
 <style scoped>
-
+  tr {
+    transition: background-color 0.1s;
+  }
+  tr:focus {
+    outline: none;
+    background-color: lightblue;
+  }
 </style>

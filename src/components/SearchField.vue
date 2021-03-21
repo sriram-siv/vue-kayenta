@@ -1,10 +1,11 @@
 <template>
-  <v-text-field
-    :class="searchInput"
-    label="Search Users"
-    v-model="searchInput"
-    @input="$emit('input:search', searchInput)"
-  ></v-text-field>
+  <div>
+    <v-text-field
+      label="Search Users"
+      v-model="searchInput"
+      @input="$emit('input:search', searchInput)"
+    ></v-text-field>
+  </div>
 </template>
 
 <script>
@@ -23,7 +24,8 @@ export default {
 </script>
 
 <style scoped>
-  .searchInput {
-    background-color: red;
+  div {
+    height: 3rem;
+    width: 100%;
   }
 </style>

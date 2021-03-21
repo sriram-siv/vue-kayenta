@@ -1,13 +1,18 @@
 <template>
   <v-app>
-    <search-field ref="searchField" @input:search="searchUsers"/>
-    <user-table :users="filteredList" :sortUsers="sortUsers" />
-    <v-btn
-      color="primary"
-      @click="clearSearch"
-    >
-    Load data
-    </v-btn>
+    <main>
+      <user-table :users="filteredList" :sortUsers="sortUsers" @select:user="selectUser"/>
+      <div class="controls">
+        <search-field ref="searchField" @input:search="searchUsers"/>
+        <v-btn color="primary">
+          Edit
+        </v-btn>
+        <v-btn color="primary">
+          Remove
+        </v-btn>
+      </div>
+
+    </main>
   </v-app>
 </template>
 
@@ -28,6 +33,7 @@ export default {
     uid: 0,
     searchValue: '',
     filteredList: [],
+    selected: null,
   }),
   async mounted() {
     const res = await fetch('https://randomuser.me/api/?results=10');
@@ -82,9 +88,27 @@ export default {
     clearSearch() {
       this.$refs.searchField.clearInput()
     },
+    selectUser(user) {
+      this.selected = this.selected === user.id ? null : user.id
+    }
   },
-  computed: {
-
-  }
 };
 </script>
+
+<style scoped>
+  main {
+    margin: 10px;
+    padding: 5px;
+    border: 1px solid #aaaa;
+    border-radius: 5px;
+    box-shadow: 1px 1px 3px 1px #aaaa;
+  }
+  .controls {
+    display: flex;
+    align-items: center;
+  }
+
+  .v-btn {
+    margin: auto 5px;
+  }
+</style>
