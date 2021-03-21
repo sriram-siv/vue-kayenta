@@ -8,28 +8,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr 
+        <tr
           v-for="user in users" 
           :key="user.id" 
+          :class="selectedUser === user.id && 'activeRecord'"
           @focus="selectUser(user)"
           tabindex="0"
         >
-          <!-- <td v-if="editing === employee.id">
-            <input type="text" v-model="employee.name" />
-          </td> -->
-          <td>{{ user.name.first }}</td>
-          <!-- <td v-if="editing === employee.id">
-            <input type="text" v-model="employee.email" />
-          </td> -->
+          <td v-if="editMode && selectedUser === user.id">
+            <input type="text" v-model="user.name.first" />
+          </td>
+          <td v-else>{{ user.name.first }}</td>
           <td>{{ user.email }}</td>
-          <!-- <td v-if="editing === employee.id">
-            <button @click="editEmployee(employee)" >Save</button>
-            <button class="muted-button" @click="cancelEdit(employee)" >Cancel</button>
-          </td> -->
-          <!-- <td>
-            <button @click="editMode(employee)" >Edit</button>
-            <button @click="$emit('delete:employee', employee.id)" >Delete</button>
-          </td> -->
           <td>{{ getFlag(user.nat) }}</td>
         </tr>
       </tbody>
@@ -43,6 +33,11 @@ export default {
   props: {
     users: Array,
     sortUsers: Function,
+    selectedUser: Number,
+    editMode: Boolean,
+  },
+  updated() {
+    console.log(this.$props.selectedUser)
   },
   methods: {
     getFlag(countryCode) {
@@ -63,6 +58,14 @@ export default {
   }
   tr:focus {
     outline: none;
+  }
+  tr.activeRecord {
     background-color: lightblue;
+  }
+  input {
+    height: 2.5rem;
+    padding: 5px;
+    margin: 5px;
+    background-color: red;
   }
 </style>

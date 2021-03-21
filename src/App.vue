@@ -1,13 +1,19 @@
 <template>
   <v-app>
     <main>
-      <user-table :users="filteredList" :sortUsers="sortUsers" @select:user="selectUser"/>
+      <user-table 
+        :users="filteredList" 
+        :sortUsers="sortUsers"
+        :editMode="editMode"
+        :selectedUser="selected"
+        @select:user="selectUser"
+      />
       <div class="controls">
         <search-field ref="searchField" @input:search="searchUsers"/>
-        <v-btn color="primary">
+        <v-btn color="primary" @click="editUser">
           Edit
         </v-btn>
-        <v-btn color="primary">
+        <v-btn color="primary" :disabled="this.selected === null" @click="removeUser">
           Remove
         </v-btn>
       </div>
@@ -19,6 +25,8 @@
 <script>
 import UserTable from '@/components/UserTable';
 import SearchField from '@/components/SearchField';
+
+import { pick } from './helpers.js'
 
 export default {
   name: 'App',
@@ -34,17 +42,20 @@ export default {
     searchValue: '',
     filteredList: [],
     selected: null,
+    editMode: false,
   }),
   async mounted() {
     const res = await fetch('https://randomuser.me/api/?results=10');
     const data = await res.json();
 
     this.uid = 0;
-
-    const users = data.results.map(user => ({
-      ...user,
-      id: this.uid++,
-    }));
+    
+    const users = data.results
+      .map(userData => pick(userData, ['name', 'email', 'nat']))
+      .map(user => ({
+        ...user,
+        id: this.uid++,
+      }));
 
     this.users = users;
   },
@@ -86,11 +97,24 @@ export default {
       }
     },
     clearSearch() {
-      this.$refs.searchField.clearInput()
+      this.$refs.searchField.clearInput();
     },
     selectUser(user) {
-      this.selected = this.selected === user.id ? null : user.id
-    }
+      this.selected = this.selected === user.id ? null : user.id;
+      this.editMode = false;
+    },
+    removeUser() {
+      if (this.selected === null) return;
+      this.users = this.users.filter(user => user.id !== this.selected);
+    },
+    editUser() {
+      if (this.selected === null) {
+        this.editMode = false;
+        return;
+      }
+      this.editMode = !this.editMode;
+
+    },
   },
 };
 </script>
